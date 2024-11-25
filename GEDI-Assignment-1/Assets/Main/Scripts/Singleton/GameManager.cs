@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     private AudioSystem audioSystem;
-    private FactorySpawner factorySpawner;
+    private BulletSpawner bulletSpawner;
 
     private void Awake()
     {
@@ -28,18 +28,20 @@ public class GameManager : MonoBehaviour
         }
 
         audioSystem = gameObject.GetComponent<AudioSystem>();
-        factorySpawner = gameObject.GetComponent<FactorySpawner>();
+        bulletSpawner = gameObject.GetComponent<BulletSpawner>();
     }
+
+
 
     public void PlayAudio()//play audio signal between scripts
     {
-        Debug.Log(audioSystem.ReturnAudio());//send data
+        audioSystem.ReturnAudio(1);//send data
     }
 
 
     public void ShootGun(Transform transform, GameObject gameObject)//spawn entity signal between scripts
     {
-        factorySpawner.EntitySpawner(transform, gameObject);//send data
+        bulletSpawner.EntitySpawner(transform, gameObject);//send data
     }
 }
 

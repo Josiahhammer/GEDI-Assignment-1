@@ -14,7 +14,7 @@ using UnityEngine;
 /// </summary>
 
 
-public class FactorySpawner : MonoBehaviour
+public class BulletSpawner : MonoBehaviour
 {
 
     private Transform firePoint;//entity location

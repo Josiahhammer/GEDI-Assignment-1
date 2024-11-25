@@ -7,7 +7,6 @@ public class Bullet : MonoBehaviour
 
     public float speed = 20f;
     public Rigidbody rb;
-    public GameObject gameObject;
 
     /// <summary>
     /// 
@@ -26,11 +25,27 @@ public class Bullet : MonoBehaviour
         rb.velocity = transform.right * speed;// set velocity of entity
     }
 
-    private void OnTriggerEnter(Collider hitInfo)//hit collider
+    private void OnTriggerStay(Collider collider)//hit collider
     {
-        Enemy enemy = hitInfo.GetComponent<Enemy>();//is it enemy?
-        enemy.Die();//enemy die
-        Destroy(gameObject);//destroy
+    //Enemy enemy = hitInfo.GetComponent<Enemy>();//is it enemy?
+    //enemy.Die();//enemy die
+    //Destroy(gameObject);//destroy
+
+
+
+        if (collider.gameObject.tag == "Enemy")
+        {
+            Enemy enemy = collider.GetComponent<Enemy>();
+            enemy.Die();
+            Destroy(gameObject);
+        }
+
+        else if (collider.gameObject.tag == "Wall")
+        {
+            Destroy(gameObject);
+        }
 
     }
+
+
 }
