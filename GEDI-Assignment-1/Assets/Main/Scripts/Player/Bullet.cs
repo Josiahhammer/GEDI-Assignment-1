@@ -4,6 +4,12 @@ public class Bullet : MonoBehaviour
 {
     public float speed = 20f;
     public Rigidbody rb;
+    public UIController uiController;
+
+    private void Awake()
+    {
+        uiController = FindObjectOfType<UIController>();
+    }
 
     private void OnEnable()
     {
@@ -22,6 +28,7 @@ public class Bullet : MonoBehaviour
             if (enemy != null)
             {
                 enemy.Die();
+                uiController.enemyKilled = true;
             }
 
             // Return to the pool instead of destroying

@@ -8,16 +8,28 @@ public class UIController : MonoBehaviour
     public static UIController Instance { get; private set; }
 
     [SerializeField] private Scrollbar scrollbar;
+    [SerializeField] private Text text;
+    [SerializeField] private float currentScore;
+    [SerializeField] public bool enemyKilled;
 
-/*    private void Awake()
+    private void Awake()
     {
-        if (Instance != null && Instance != this)
+        currentScore = 0;
+        enemyKilled = false;
+    }
+
+    private void Update()
+    {
+        if (enemyKilled == true)
         {
-            Destroy(gameObject);
-            return;
+            currentScore++;
+            enemyKilled = false;
+            text.text = currentScore.ToString();
         }
-        Instance = this;
-    }*/
+
+    }
+
+
 
     private void OnEnable()
     {
