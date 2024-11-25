@@ -8,14 +8,14 @@ public class EnemySpawner : MonoBehaviour
     public int maxEnemies = 10;      // Maximum number of enemies to spawn
     public float spawnInterval = 2f; // Time interval between spawns (in seconds)
 
-    public int currentEnemyCount = 0; // Current number of enemies spawned
+    public int currentEnemyCount = 0; // Current number of active enemies
 
     private EnemyFactory enemyFactory; // The factory for creating enemies
 
     void Start()
     {
         // Initialize the factory with the prefab, player, and spawner reference
-        enemyFactory = new EnemyFactory(enemyPrefab, player, this);
+        enemyFactory = new EnemyFactory(enemyPrefab, player, this, maxEnemies);
 
         // Start the coroutine to spawn enemies
         StartCoroutine(SpawnEnemies());
@@ -24,11 +24,14 @@ public class EnemySpawner : MonoBehaviour
     // Coroutine to spawn enemies at a regular interval
     IEnumerator SpawnEnemies()
     {
-        while (currentEnemyCount < maxEnemies)
+        while (true) // Continuously spawn enemies
         {
-            // Spawn a new enemy with a random speed between 1.5 and 3.5
-            float randomSpeed = Random.Range(1.5f, 3.5f);
-            SpawnEnemy(randomSpeed);
+            if (currentEnemyCount < maxEnemies)
+            {
+                // Spawn a new enemy with a random speed between 1.5 and 3.5
+                float randomSpeed = Random.Range(1.5f, 3.5f);
+                SpawnEnemy(randomSpeed);
+            }
 
             // Wait for the specified interval before spawning the next enemy
             yield return new WaitForSeconds(spawnInterval);
@@ -43,6 +46,13 @@ public class EnemySpawner : MonoBehaviour
 
         // Increment the enemy count
         currentEnemyCount++;
+    }
+
+    // Method to return an enemy to the pool
+    public void ReturnEnemy(GameObject enemy)
+    {
+        enemyFactory.ReturnEnemy(enemy);
+        currentEnemyCount--;
     }
 
     // Example method to generate random spawn positions

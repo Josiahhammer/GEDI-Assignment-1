@@ -2,26 +2,42 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public int health = 100;
-    public Transform player; // Reference to the player's Transform
-    public float speed = 2f; // Speed at which the enemy moves
-    public EnemySpawner enemySpawner;
+    public Transform player;          // The player to follow
+    public EnemySpawner enemySpawner; // Reference to the spawner
+    public float speed = 2f;          // Speed of the enemy
 
-    void Start()
+    // Initialize enemy properties
+    public void Initialize(Transform player, float speed, EnemySpawner spawner)
     {
-        player = GameObject.Find("PF_Player").transform; // Adjust to your player GameObject name
+        this.player = player;
+        this.speed = speed;
+        this.enemySpawner = spawner;
     }
 
     void Update()
     {
-        Vector3 direction = (player.position - transform.position).normalized;
-        transform.position += direction * speed * Time.deltaTime;
+        // Move towards the player
+        if (player != null)
+        {
+            Vector3 direction = (player.position - transform.position).normalized;
+            transform.position += direction * speed * Time.deltaTime;
+        }
+    }
+
+    // When the enemy is disabled, return it to the pool
+    private void OnDisable()
+    {
+        if (enemySpawner != null)
+        {
+            enemySpawner.ReturnEnemy(gameObject);
+        }
     }
 
     public void Die()
     {
         enemySpawner.currentEnemyCount--;
         // Destroy this enemy
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
+
 }

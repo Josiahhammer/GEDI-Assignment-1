@@ -1,51 +1,50 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-
     public float speed = 20f;
     public Rigidbody rb;
 
-    /// <summary>
-    /// 
-    /// This is my showcase of  singleton
-    /// 
-    /// I have the scipt watching the bullet.
-    /// it places values once it spawns and does calculations
-    /// 
-    /// </summary>
-
-
-    // Start is called before the first frame update
-
-    void Start()
+    private void OnEnable()
     {
-        rb.velocity = transform.right * speed;// set velocity of entity
+        // Set velocity when the bullet is enabled
+        if (rb != null)
+        {
+            rb.velocity = transform.right * speed;
+        }
     }
 
-    private void OnTriggerStay(Collider collider)//hit collider
+    private void OnTriggerStay(Collider collider)
     {
-    //Enemy enemy = hitInfo.GetComponent<Enemy>();//is it enemy?
-    //enemy.Die();//enemy die
-    //Destroy(gameObject);//destroy
-
-
-
-        if (collider.gameObject.tag == "Enemy")
+        if (collider.gameObject.CompareTag("Enemy"))
         {
             Enemy enemy = collider.GetComponent<Enemy>();
-            enemy.Die();
-            Destroy(gameObject);
-        }
+            if (enemy != null)
+            {
+                enemy.Die();
+            }
 
-        else if (collider.gameObject.tag == "Wall")
+            // Return to the pool instead of destroying
+            ReturnToPool();
+        }
+        else if (collider.gameObject.CompareTag("Wall"))
         {
-            Destroy(gameObject);
+            // Return to the pool instead of destroying
+            ReturnToPool();
         }
-
     }
 
-
+    private void ReturnToPool()
+    {
+        BulletSpawner spawner = FindObjectOfType<BulletSpawner>();
+        if (spawner != null)
+        {
+            spawner.ReturnBullet(gameObject);
+        }
+        else
+        {
+            Debug.LogWarning("No BulletSpawner found! Destroying bullet.");
+            Destroy(gameObject); // Fallback in case no spawner exists
+        }
+    }
 }

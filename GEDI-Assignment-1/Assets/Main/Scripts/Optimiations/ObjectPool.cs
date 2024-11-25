@@ -1,56 +1,46 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
-public class ObjectPool : MonoBehaviour
+public class ObjectPool
 {
-    [Serializable]
-    private struct PooledObject
+    private GameObject prefab; // The prefab to pool
+    private Queue<GameObject> pool; // Queue to hold pooled objects
+    private int maxSize; // Maximum pool size
+
+    public ObjectPool(GameObject prefab, int maxSize)
     {
-        public GameObject prefab;
-        public int numToSpawn;
+        this.prefab = prefab;
+        this.maxSize = maxSize;
+        pool = new Queue<GameObject>();
+
+        // Prepopulate the pool
+        for (int i = 0; i < maxSize; i++)
+        {
+            GameObject obj = Object.Instantiate(prefab);
+            obj.SetActive(false);
+            pool.Enqueue(obj);
+        }
     }
 
-    [SerializeField] private PooledObject[] pools;
-
-    private static readonly Dictionary<string, Queue<GameObject>> pooledObjects = new Dictionary<string, Queue<GameObject>>();
-
-    private void Awake()
+    public GameObject GetObject()
     {
-        pooledObjects.Clear();
-
-        foreach (PooledObject pool in pools) 
+        if (pool.Count > 0)
         {
-            string name = pool.prefab.name;
-            Transform parent = new GameObject(name).transform;
-            parent.SetParent(transform);
-            Queue<GameObject> objectsToSpawn = new(pool.numToSpawn);
-            for (int i = 0; i < pool.numToSpawn; i++)
-            {
-                GameObject rb = Instantiate(pool.prefab, parent);
-                rb.gameObject.SetActive(false);
-                objectsToSpawn.Enqueue(rb);
-            }
-            pooledObjects.Add(name, objectsToSpawn);
+            GameObject obj = pool.Dequeue();
+            obj.SetActive(true);
+            return obj;
         }
-
-
+        else
+        {
+            // Optionally expand pool if maxSize isn't strict
+            GameObject obj = Object.Instantiate(prefab);
+            return obj;
+        }
     }
 
-    public static GameObject Shoot(string name, Vector3 position, float speed, Quaternion rotation)
+    public void ReturnObject(GameObject obj)
     {
-        if (!pooledObjects.ContainsKey(name))
-        {
-            Debug.LogAssertion("Pool does not contain key: " + name);
-            return null;
-        }
-        GameObject rb = pooledObjects[name].Dequeue();
-
-        rb.transform.position = position;
-        rb.gameObject.SetActive(true);
-
-        pooledObjects[name].Enqueue(rb);
-        return rb;
+        obj.SetActive(false);
+        pool.Enqueue(obj);
     }
 }
